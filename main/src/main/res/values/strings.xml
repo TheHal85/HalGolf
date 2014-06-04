@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MC Golf 2014</string>
+    <string name="title_section1">Rules 2014</string>
+    <string name="title_section2">Score Tracker</string>
+    <string name="title_section3">Course Information</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="golf_first_name">
+        <item>Mike</item>
+        <item>Dave</item>
+        <item>Zack</item>
+        <item>Mike</item>
+        <item>Jason</item>
+        <item>Erica</item>
+        <item>Tony</item>
+        <item>Mark</item>
+        <item>Christina</item>
+        <item>Brandon</item>
+        <item>John</item>
+        <item>Chris</item>
+        <item>Peter</item>
+        <item>Chad</item>
+        <item>Patrick</item>
+        <item>Ben</item>
+        <item>Michael</item>
+        <item>Ryan</item>
+        <item>Richard</item>
+        <item>Kevin</item>
+        <item>Steve</item>
+        <item>Wil</item>
+        <item>Vincent</item>
+        <item>Dan</item>
+        <item>Allison</item>
+        <item>Andrew</item>
+        <item>Paula</item>
+        <item>Eric</item>
+        <item>Chris</item>
+        <item>Fan</item>
+        <item>Qingrui</item>
+        <item>Rob</item>
+    </string-array>
+    <string-array name="golf_last_name">
+        <item>Muccilo</item>
+        <item>DelBeccaro</item>
+        <item>Hansen</item>
+        <item>McCrackan</item>
+        <item>Priar</item>
+        <item>Librach</item>
+        <item>Sibilla</item>
+        <item>Melvin</item>
+        <item>Tancredi</item>
+        <item>Marucci</item>
+        <item>Corson</item>
+        <item>Frey</item>
+        <item>Glenn</item>
+        <item>Lynch</item>
+        <item>Dougherty</item>
+        <item>Smith</item>
+        <item>Corry</item>
+        <item>Hallermeier</item>
+        <item>Ford</item>
+        <item>Boone</item>
+        <item>Bollard</item>
+        <item>Morrison</item>
+        <item>McKeever</item>
+        <item>Scanlan</item>
+        <item>Cleveland</item>
+        <item>Kim</item>
+        <item>Calhoun</item>
+        <item>Steinfeldt</item>
+        <item>Deely</item>
+        <item>Zhang</item>
+        <item>Liu</item>
+        <item>Decker</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="par">
+        <item>4</item>
+        <item>3</item>
+        <item>5</item>
+        <item>4</item>
+        <item>3</item>
+        <item>4</item>
+        <item>4</item>
+        <item>4</item>
+        <item>4</item>
+        <item>4</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>4</item>
+        <item>3</item>
+        <item>4</item>
+        <item>4</item>
+        <item>4</item>
+    </integer-array>
+
+    <integer-array name="men_distance">
+        <item>345</item>
+        <item>155</item>
+        <item>532</item>
+        <item>340</item>
+        <item>175</item>
+        <item>395</item>
+        <item>395</item>
+        <item>315</item>
+        <item>415</item>
+        <item>324</item>
+        <item>150</item>
+        <item>380</item>
+        <item>525</item>
+        <item>420</item>
+        <item>127</item>
+        <item>318</item>
+        <item>395</item>
+        <item>415</item>
+    </integer-array>
+
+    <integer-array name="women_distance">
+        <item>291</item>
+        <item>79</item>
+        <item>464</item>
+        <item>301</item>
+        <item>121</item>
+        <item>361</item>
+        <item>322</item>
+        <item>283</item>
+        <item>360</item>
+        <item>270</item>
+        <item>84</item>
+        <item>339</item>
+        <item>466</item>
+        <item>361</item>
+        <item>91</item>
+        <item>277</item>
+        <item>350</item>
+        <item>346</item>
+    </integer-array>
+</resources>
