@@ -3,8 +3,9 @@
 
     <string name="app_name">MC Golf 2014</string>
     <string name="title_section1">Rules 2014</string>
-    <string name="title_section2">Score Tracker</string>
-    <string name="title_section3">Course Information</string>
+    <string name="title_section2">Players</string>
+    <string name="title_section3">Score Tracker</string>
+    <string name="title_section4">Course Information</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
@@ -76,6 +77,18 @@
         <item>Zhang</item>
         <item>Liu</item>
         <item>Decker</item>
+    </string-array>
+
+    <string-array name="courses">
+    <item>PineCrest Country Club</item>
+    </string-array>
+
+    <string-array name="rules">
+        <item>Each player will hit a ball off the tee (first shot for the hole)</item>
+        <item>The team will decide which of the first shots is to be used. The person who hit that first shot will no longer hit any more balls until the other 3 players have their shot used. The 3 remaining players will hit a ball from the position of the first shot.</item>
+        <item>The team will now decide on which one of the 3 second shots will be used. Again, whoever hit the second shot that is being used by the team will not hit until the remaining 2 players left use their shots.</item>
+        <item>After the 4th person on the team hits their shot, normally anyone can hit the fifth shot.  This year, the fifth or greater shot also has to be rotated in the groups.  Meaning:  If player X hits the 5th shot on the first hole, they cannot hit another 5th or more shot until everyone has hit a second additional shot.  This may seem hard to track, but it shouldn’t be.
+a.     On your scorecard, for each hole, put an check mark in the box for the person that hit an extra shot.  It will then be easy to see who is eligible for the next shot.</item>
     </string-array>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>

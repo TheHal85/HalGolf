@@ -1,8 +1,8 @@
 package com.ryan.hallermeier.golfrules.main;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +12,27 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.ryan.hallermeier.golfrules.main.models.Player;
 
-import java.util.ArrayList;
+import com.ryan.hallermeier.golfrules.main.dummy.DummyContent;
+import com.ryan.hallermeier.golfrules.main.models.Hole;
 
-public class RulesFragment extends Fragment implements AbsListView.OnItemClickListener {
+/**
+ * A fragment representing a list of Items.
+ * <p />
+ * Large screen devices (such as tablets) are supported by replacing the ListView
+ * with a GridView.
+ * <p />
+ * Activities containing this fragment MUST implement the {@link Callbacks}
+ * interface.
+ */
+public class HoleInformationalFragment extends Fragment implements AbsListView.OnItemClickListener {
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_COURSE_ID = "course_id";
+
+    // TODO: Rename and change types of parameters
+    private int courseId;
 
     private GolfFragmentInteractionInterface mListener;
 
@@ -30,11 +46,10 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
      * Views.
      */
     private ListAdapter mAdapter;
-
-    // TODO: Rename and change types of parameters
-    public static RulesFragment newInstance() {
-        RulesFragment fragment = new RulesFragment();
+    public static HoleInformationalFragment newInstance(int courseId) {
+        HoleInformationalFragment fragment = new HoleInformationalFragment();
         Bundle args = new Bundle();
+        args.putInt(ARG_COURSE_ID, courseId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,22 +58,26 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public RulesFragment() {
+    public HoleInformationalFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (getArguments() != null) {
+            courseId = getArguments().getInt(ARG_COURSE_ID);
+        }
+
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, mListener.getRules() );
+        mAdapter = new ArrayAdapter<Hole>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, mListener.getHolesByCourseId(courseId));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_rules, container, false);
+        View view = inflater.inflate(R.layout.fragment_hole, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -93,7 +112,7 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-
+            //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
     }
 

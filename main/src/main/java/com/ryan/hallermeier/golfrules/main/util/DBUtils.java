@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.ryan.hallermeier.golfrules.main.models.Course;
+import com.ryan.hallermeier.golfrules.main.models.Hole;
 import com.ryan.hallermeier.golfrules.main.models.Player;
 
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public class DBUtils extends SQLiteOpenHelper {
 
     //Player Column Names
     private static final String COLUMN_FIRST_NAME = "first_name";
-    private static final String COLUMN_LAST_NAME  = "last_name";
+    private static final String COLUMN_LAST_NAME = "last_name";
     private static final String COLUMN_EXTRA_SHOT = "extra_shot";
 
     //Round Column Names
@@ -146,8 +148,9 @@ public class DBUtils extends SQLiteOpenHelper {
 
 
     //Helper Methods
-    public void addPlayer( Player player)
-    {
+
+    //Player Methods
+    public void addPlayer(Player player) {
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -168,7 +171,7 @@ public class DBUtils extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Player getPlayer(int id){
+    public Player getPlayer(int id) {
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
@@ -178,7 +181,7 @@ public class DBUtils extends SQLiteOpenHelper {
                 db.query(TABLE_PLAYER, // a. table
                         COLUMNS_PLAYER, // b. column names
                         " id = ?", // c. selections
-                        new String[] { String.valueOf(id) }, // d. selections args
+                        new String[]{String.valueOf(id)}, // d. selections args
                         null, // e. group by
                         null, // f. having
                         null, // g. order by
@@ -188,7 +191,7 @@ public class DBUtils extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        // 4. build book object
+        // 4. build player object
         Player player = new Player();
         player.setPlayerId(cursor.getInt(0));
         player.setTeamId(cursor.getInt(1));
@@ -196,7 +199,7 @@ public class DBUtils extends SQLiteOpenHelper {
         player.setLastName(cursor.getString(3));
         player.setExtraShot(cursor.getInt(4));
 
-        // 5. return book
+        // 5. return player
         return player;
     }
 
@@ -210,7 +213,7 @@ public class DBUtils extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
-        // 3. go over each row, build book and add it to list
+        // 3. go over each row, build player and add it to list
         Player player = null;
         if (cursor.moveToFirst()) {
             do {
@@ -221,11 +224,40 @@ public class DBUtils extends SQLiteOpenHelper {
                 player.setLastName(cursor.getString(3));
                 player.setExtraShot(cursor.getInt(4));
 
-                // Add book to books
+                // Add player to players
                 players.add(player);
             } while (cursor.moveToNext());
         }
-        // return books
+        // return players
+        return players;
+    }
+
+    public ArrayList<Player> getAllPlayersByTeamId(int teamId) {
+        ArrayList<Player> players = new ArrayList<Player>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_PLAYER + " WHERE " + COLUMN_TEAM_ID + "==" + teamId;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build player and add it to list
+        Player player = null;
+        if (cursor.moveToFirst()) {
+            do {
+                player = new Player();
+                player.setPlayerId(cursor.getInt(0));
+                player.setTeamId(cursor.getInt(1));
+                player.setFirstName(cursor.getString(2));
+                player.setLastName(cursor.getString(3));
+                player.setExtraShot(cursor.getInt(4));
+
+                // Add player to players
+                players.add(player);
+            } while (cursor.moveToNext());
+        }
+        // return players
         return players;
     }
 
@@ -244,8 +276,8 @@ public class DBUtils extends SQLiteOpenHelper {
         // 3. updating row
         int i = db.update(TABLE_PLAYER, //table
                 values, // column/value
-                COLUMN_PLAYER_ID+" = ?", // selections
-                new String[] { String.valueOf(player.getPlayerId()) }); //selection args
+                COLUMN_PLAYER_ID + " = ?", // selections
+                new String[]{String.valueOf(player.getPlayerId())}); //selection args
 
         // 4. close
         db.close();
@@ -261,8 +293,246 @@ public class DBUtils extends SQLiteOpenHelper {
 
         // 2. delete
         db.delete(TABLE_PLAYER, //table name
-                COLUMN_PLAYER_ID+" = ?",  // selections
-                new String[] { String.valueOf(player.getPlayerId()) }); //selections args
+                COLUMN_PLAYER_ID + " = ?",  // selections
+                new String[]{String.valueOf(player.getPlayerId())}); //selections args
+
+        // 3. close
+        db.close();
+
+    }
+
+    //Hole Methods
+    public void addHole(Hole hole) {
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HOLE_ID, hole.getHoleId());
+        values.put(COLUMN_COURSE_ID, hole.getCourseId());
+        values.put(COLUMN_PAR, hole.getPar());
+        values.put(COLUMN_MEN_DISTANCE, hole.getMenDistance());
+        values.put(COLUMN_WOMEN_DISTANCE, hole.getWomenDistance());
+
+        // 3. insert
+        db.insert(TABLE_HOLE, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public Hole getHole(int id) {
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_HOLE, // a. table
+                        COLUMNS_HOLE, // b. column names
+                        " id = ?", // c. selections
+                        new String[]{String.valueOf(id)}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build hole object
+        Hole hole = new Hole();
+        hole.setHoleId(cursor.getInt(0));
+        hole.setCourseId(cursor.getInt(1));
+        hole.setPar(cursor.getInt(2));
+        hole.setMenDistance(cursor.getInt(3));
+        hole.setWomenDistance(cursor.getInt(4));
+
+
+        // 5. return hole
+        return hole;
+    }
+
+    public ArrayList<Hole> getAllHolesByCourseId(int courseId) {
+        ArrayList<Hole> holes = new ArrayList<Hole>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_HOLE + " WHERE " + COLUMN_COURSE_ID + "==" + courseId;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Hole hole = null;
+        if (cursor.moveToFirst()) {
+            do {
+                hole = new Hole();
+                hole.setHoleId(cursor.getInt(0));
+                hole.setCourseId(cursor.getInt(1));
+                hole.setPar(cursor.getInt(2));
+                hole.setMenDistance(cursor.getInt(3));
+                hole.setWomenDistance(cursor.getInt(4));
+
+                // Add hole to holes
+                holes.add(hole);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return holes;
+    }
+
+    public int updateHole(Hole hole) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_COURSE_ID, hole.getCourseId());
+        values.put(COLUMN_PAR, hole.getPar());
+        values.put(COLUMN_MEN_DISTANCE, hole.getMenDistance());
+        values.put(COLUMN_WOMEN_DISTANCE, hole.getWomenDistance());
+
+        // 3. updating row
+        int i = db.update(TABLE_HOLE, //table
+                values, // column/value
+                COLUMN_HOLE_ID + " = ?", // selections
+                new String[]{String.valueOf(hole.getHoleId())}); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteHole(Hole hole) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_HOLE, //table name
+                COLUMN_HOLE_ID + " = ?",  // selections
+                new String[]{String.valueOf(hole.getHoleId())}); //selections args
+
+        // 3. close
+        db.close();
+
+    }
+
+
+    //Course Methods
+    public void addCourse(Course course) {
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_COURSE_ID, course.getCourseId());
+        values.put(COLUMN_COURSE_NAME, course.getCourseName());
+
+        // 3. insert
+        db.insert(TABLE_COURSE, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public Course getCourse(int id) {
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_COURSE, // a. table
+                        COLUMNS_COURSE, // b. column names
+                        " id = ?", // c. selections
+                        new String[]{String.valueOf(id)}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build hole object
+        Course course = new Course();
+        course.setCourseId(cursor.getInt(0));
+        course.setCourseName(cursor.getString(1));
+
+
+        // 5. return hole
+        return course;
+    }
+
+    public ArrayList<Course> getAllCourses() {
+        ArrayList<Course> courses = new ArrayList<Course>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_COURSE;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Course course = null;
+        if (cursor.moveToFirst()) {
+            do {
+                course = new Course();
+                course.setCourseId(cursor.getInt(0));
+                course.setCourseName(cursor.getString(1));
+
+                // Add hole to holes
+                courses.add(course);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return courses;
+    }
+
+    public int updateCourse(Course course) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_COURSE_ID, course.getCourseId());
+        values.put(COLUMN_COURSE_NAME, course.getCourseName());
+
+        // 3. updating row
+        int i = db.update(TABLE_COURSE, //table
+                values, // column/value
+                COLUMN_COURSE_ID + " = ?", // selections
+                new String[]{String.valueOf(course.getCourseId())}); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteCourse(Course course) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_COURSE, //table name
+                COLUMN_COURSE_ID + " = ?",  // selections
+                new String[]{String.valueOf(course.getCourseId())}); //selections args
 
         // 3. close
         db.close();

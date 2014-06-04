@@ -23,6 +23,30 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course";
+        return courseName;
+    }
+
+    public int getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public ArrayList<Hole> getHoles() {
+        return holes;
+    }
+
+    public void setHoles(ArrayList<Hole> holes) {
+        this.holes = holes;
     }
 }

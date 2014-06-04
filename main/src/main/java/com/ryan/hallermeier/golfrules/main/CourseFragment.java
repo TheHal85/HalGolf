@@ -1,8 +1,8 @@
 package com.ryan.hallermeier.golfrules.main;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +12,20 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.ryan.hallermeier.golfrules.main.models.Player;
 
-import java.util.ArrayList;
+import com.ryan.hallermeier.golfrules.main.dummy.DummyContent;
+import com.ryan.hallermeier.golfrules.main.models.Course;
 
-public class RulesFragment extends Fragment implements AbsListView.OnItemClickListener {
+/**
+ * A fragment representing a list of Items.
+ * <p />
+ * Large screen devices (such as tablets) are supported by replacing the ListView
+ * with a GridView.
+ * <p />
+ * Activities containing this fragment MUST implement the {@link Callbacks}
+ * interface.
+ */
+public class CourseFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private GolfFragmentInteractionInterface mListener;
 
@@ -31,9 +40,8 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
      */
     private ListAdapter mAdapter;
 
-    // TODO: Rename and change types of parameters
-    public static RulesFragment newInstance() {
-        RulesFragment fragment = new RulesFragment();
+    public static CourseFragment newInstance() {
+        CourseFragment fragment = new CourseFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -43,22 +51,26 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public RulesFragment() {
+    public CourseFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (getArguments() != null) {
+
+        }
+
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, mListener.getRules() );
+        mAdapter = new ArrayAdapter<Course>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, mListener.getCourses());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_rules, container, false);
+        View view = inflater.inflate(R.layout.fragment_course, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -93,7 +105,7 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-
+            mListener.onCourseSelected(position);
         }
     }
 
@@ -109,4 +121,5 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
             ((TextView) emptyView).setText(emptyText);
         }
     }
+
 }

@@ -3,32 +3,26 @@ package com.ryan.hallermeier.golfrules.main;
 import android.app.Activity;
 
 import android.app.ActionBar;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.ryan.hallermeier.golfrules.main.models.Course;
+import com.ryan.hallermeier.golfrules.main.models.Hole;
 import com.ryan.hallermeier.golfrules.main.models.Player;
 import com.ryan.hallermeier.golfrules.main.util.DBUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 
 public class MainActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, RulesFragment.OnFragmentInteractionListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, GolfFragmentInteractionInterface {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -41,6 +35,8 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
 
     private DBUtils dbUtils;
+
+    private ArrayList<String> rules;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +54,29 @@ public class MainActivity extends Activity
 
         dbUtils = new DBUtils(this);
         Resources res = getResources();
+
+        String[] courseNames = res.getStringArray(R.array.courses);
+        if (courseNames.length != dbUtils.getAllCourses().size()) {
+            createCourses(dbUtils, courseNames);
+        }
+
+        int[] parValues = res.getIntArray(R.array.par);
+        int[] mensDistance = res.getIntArray(R.array.men_distance);
+        int[] womensDistance = res.getIntArray(R.array.women_distance);
+        if (parValues.length != dbUtils.getAllHolesByCourseId(0).size()) {
+            createHoles(dbUtils, 0, parValues, mensDistance, womensDistance);
+        }
+
+
         String[] lastNames = res.getStringArray(R.array.golf_last_name);
         String[] firstNames = res.getStringArray(R.array.golf_first_name);
-        if (lastNames.length > dbUtils.getAllPlayers().size()) {
+        if (lastNames.length != dbUtils.getAllPlayers().size()) {
             createPlayers(dbUtils, lastNames, firstNames);
         }
+
+        String[] rulesArray = res.getStringArray(R.array.rules);
+        rules = new ArrayList<String>();
+        Collections.addAll(rules, rulesArray);
 
     }
 
@@ -72,21 +86,25 @@ public class MainActivity extends Activity
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (position) {
+            case 0:
+                fragmentTransaction.replace(R.id.container, RulesFragment.newInstance());
+                fragmentTransaction.commit();
+                break;
             case 1:
-                fragmentTransaction.replace(R.id.container, RulesFragment.newInstance("", ""));
+                fragmentTransaction.replace(R.id.container, PlayersFragment.newInstance());
                 fragmentTransaction.commit();
                 break;
             case 2:
-                fragmentTransaction.replace(R.id.container, ScoreTrackerFragment.newInstance("", ""));
+                fragmentTransaction.replace(R.id.container, ScoreTrackerFragment.newInstance());
                 fragmentTransaction.commit();
                 break;
             case 3:
-                fragmentTransaction.replace(R.id.container, CourseInformationFragment.newInstance("", ""));
+                fragmentTransaction.replace(R.id.container, CourseFragment.newInstance());
                 fragmentTransaction.commit();
                 break;
         }
 
-        }
+    }
 
     public void onSectionAttached(int number) {
         switch (number) {
@@ -99,6 +117,20 @@ public class MainActivity extends Activity
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
+            case 4:
+                mTitle = getString(R.string.title_section3);
+                break;
+        }
+    }
+
+    private void createCourses(DBUtils dbUtils, String[] courseNames) {
+        ArrayList<Course> courses = dbUtils.getAllCourses();
+        for (Course course : courses) {
+            dbUtils.deleteCourse(course);
+        }
+        final int size = courseNames.length;
+        for (int i = 0; i < size; i++) {
+            dbUtils.addCourse(new Course(i, courseNames[i]));
         }
     }
 
@@ -111,8 +143,17 @@ public class MainActivity extends Activity
         for (int i = 0; i < size; i++) {
             dbUtils.addPlayer(new Player(i, firstNames[i], lastNames[i], 0));
         }
-        dbUtils.getAllPlayers();
+    }
 
+    private void createHoles(DBUtils dbUtils, int courseId ,  int[] parValues, int[] menDistances, int[] womensDistance) {
+        ArrayList<Hole> holes = dbUtils.getAllHolesByCourseId(courseId);
+        for (Hole hole : holes) {
+            dbUtils.deleteHole(hole);
+        }
+        final int size = parValues.length;
+        for (int i = 0; i < size; i++) {
+            dbUtils.addHole(new Hole(i+1, courseId, parValues[i], menDistances[i], womensDistance[i]));
+        }
     }
 
     public void restoreActionBar() {
@@ -154,7 +195,26 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onFragmentInteraction(int position) {
-        Toast.makeText(this, getPlayers().get(position).getFirstName(), Toast.LENGTH_SHORT).show();
+    public void onCourseSelected(int courseId) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container, HoleInformationalFragment.newInstance(courseId));
+                fragmentTransaction.commit();
     }
+
+    @Override
+    public ArrayList<Hole> getHolesByCourseId(int courseId) {
+        return dbUtils.getAllHolesByCourseId(courseId);
+    }
+
+    @Override
+    public ArrayList<Course> getCourses() {
+        return dbUtils.getAllCourses();
+    }
+
+    @Override
+    public ArrayList<String> getRules() {
+        return rules;
+    }
+
 }

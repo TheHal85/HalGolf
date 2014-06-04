@@ -20,7 +20,30 @@ public class Shot {
         this.playerId = playerId;
     }
 
-    //getters & setters
+    public int getShotId() {
+        return shotId;
+    }
+
+    public void setShotId(int shotId) {
+        this.shotId = shotId;
+    }
+
+    public int getHoleId() {
+        return holeId;
+    }
+
+    public void setHoleId(int holeId) {
+        this.holeId = holeId;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+//getters & setters
 
     @Override
     public String toString() {

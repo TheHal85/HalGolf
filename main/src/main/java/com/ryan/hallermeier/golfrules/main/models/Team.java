@@ -28,4 +28,44 @@ public class Team {
     public String toString() {
         return "Team";
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
+    }
+
+    public int getRoundId() {
+        return roundId;
+    }
+
+    public void setRoundId(int roundId) {
+        this.roundId = roundId;
+    }
+
+    public int getTeamNumber() {
+        return teamNumber;
+    }
+
+    public void setTeamNumber(int teamNumber) {
+        this.teamNumber = teamNumber;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
+    }
 }
