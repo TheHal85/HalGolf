@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GolfRules.iml" filepath="$PROJECT_DIR$/GolfRules.iml" />
       <module fileurl="file://$PROJECT_DIR$/HalGolf.iml" filepath="$PROJECT_DIR$/HalGolf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HalGolfRepo.iml" filepath="$PROJECT_DIR$/HalGolfRepo.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/main.iml" filepath="$PROJECT_DIR$/main/main.iml" />
     </modules>
   </component>

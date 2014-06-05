@@ -10,6 +10,9 @@ import android.util.Log;
 import com.ryan.hallermeier.golfrules.main.models.Course;
 import com.ryan.hallermeier.golfrules.main.models.Hole;
 import com.ryan.hallermeier.golfrules.main.models.Player;
+import com.ryan.hallermeier.golfrules.main.models.Round;
+import com.ryan.hallermeier.golfrules.main.models.Shot;
+import com.ryan.hallermeier.golfrules.main.models.Team;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -104,7 +107,7 @@ public class DBUtils extends SQLiteOpenHelper {
 
     //Create Shot
     private static final String CREATE_TABLE_SHOT = "CREATE TABLE "
-            + TABLE_SHOT + "(" + COLUMN_SHOT_ID + " INTEGER PRIMARY KEY," + COLUMN_HOLE_ID
+            + TABLE_SHOT + "(" + COLUMN_SHOT_ID + " INTEGER," + COLUMN_HOLE_ID
             + " INTEGER," + COLUMN_PLAYER_ID
             + " INTEGER" + ")";
 
@@ -135,17 +138,27 @@ public class DBUtils extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
         // on upgrade drop older tables
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_COURSE);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_HOLE);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_PLAYER);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_ROUND);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_SHOT);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TEAM);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_COURSE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_HOLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ROUND);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOT);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM);
 
         // create new tables
         onCreate(sqLiteDatabase);
     }
 
+    public void dropTables()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COURSE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HOLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROUND);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM);
+    }
 
     //Helper Methods
 
@@ -180,7 +193,7 @@ public class DBUtils extends SQLiteOpenHelper {
         Cursor cursor =
                 db.query(TABLE_PLAYER, // a. table
                         COLUMNS_PLAYER, // b. column names
-                        " id = ?", // c. selections
+                        COLUMN_PLAYER_ID + " = ?", // c. selections
                         new String[]{String.valueOf(id)}, // d. selections args
                         null, // e. group by
                         null, // f. having
@@ -332,7 +345,7 @@ public class DBUtils extends SQLiteOpenHelper {
         Cursor cursor =
                 db.query(TABLE_HOLE, // a. table
                         COLUMNS_HOLE, // b. column names
-                        " id = ?", // c. selections
+                        COLUMN_HOLE_ID + " = ?", // c. selections
                         new String[]{String.valueOf(id)}, // d. selections args
                         null, // e. group by
                         null, // f. having
@@ -354,6 +367,35 @@ public class DBUtils extends SQLiteOpenHelper {
 
         // 5. return hole
         return hole;
+    }
+
+    public ArrayList<Hole> getAllHoles() {
+        ArrayList<Hole> holes = new ArrayList<Hole>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_HOLE;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Hole hole = null;
+        if (cursor.moveToFirst()) {
+            do {
+                hole = new Hole();
+                hole.setHoleId(cursor.getInt(0));
+                hole.setCourseId(cursor.getInt(1));
+                hole.setPar(cursor.getInt(2));
+                hole.setMenDistance(cursor.getInt(3));
+                hole.setWomenDistance(cursor.getInt(4));
+
+                // Add hole to holes
+                holes.add(hole);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return holes;
     }
 
     public ArrayList<Hole> getAllHolesByCourseId(int courseId) {
@@ -454,7 +496,7 @@ public class DBUtils extends SQLiteOpenHelper {
         Cursor cursor =
                 db.query(TABLE_COURSE, // a. table
                         COLUMNS_COURSE, // b. column names
-                        " id = ?", // c. selections
+                        COLUMN_COURSE_ID + " = ?", // c. selections
                         new String[]{String.valueOf(id)}, // d. selections args
                         null, // e. group by
                         null, // f. having
@@ -533,6 +575,468 @@ public class DBUtils extends SQLiteOpenHelper {
         db.delete(TABLE_COURSE, //table name
                 COLUMN_COURSE_ID + " = ?",  // selections
                 new String[]{String.valueOf(course.getCourseId())}); //selections args
+
+        // 3. close
+        db.close();
+
+    }
+
+    //Team Methods
+    public void addTeam(Team team) {
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TEAM_ID, team.getTeamId());
+        values.put(COLUMN_ROUND_ID, team.getRoundId());
+        values.put(COLUMN_TEAM_NUMBER, team.getTeamNumber());
+
+
+        // 3. insert
+        db.insert(TABLE_TEAM, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public Team getTeam(int id) {
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_TEAM, // a. table
+                        COLUMNS_TEAM, // b. column names
+                        COLUMN_TEAM_ID + " = ?", // c. selections
+                        new String[]{String.valueOf(id)}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build hole object
+        Team team = new Team();
+        team.setTeamId(cursor.getInt(0));
+        team.setRoundId(cursor.getInt(1));
+        team.setTeamNumber(cursor.getInt(2));
+
+
+        // 5. return hole
+        return team;
+    }
+
+    public ArrayList<Team> getAllTeams() {
+        ArrayList<Team> teams = new ArrayList<Team>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_TEAM;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Team team = null;
+        if (cursor.moveToFirst()) {
+            do {
+                team = new Team();
+                team.setTeamId(cursor.getInt(0));
+                team.setRoundId(cursor.getInt(1));
+                team.setTeamNumber(cursor.getInt(2));
+
+                // Add hole to holes
+                teams.add(team);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return teams;
+    }
+
+    public ArrayList<Team> getTeamsByRoundId(int roundId) {
+        ArrayList<Team> teams = new ArrayList<Team>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_TEAM + " WHERE " + COLUMN_ROUND_ID + "==" + roundId;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Team team = null;
+        if (cursor.moveToFirst()) {
+            do {
+                team = new Team();
+                team.setTeamId(cursor.getInt(0));
+                team.setRoundId(cursor.getInt(1));
+                team.setTeamNumber(cursor.getInt(2));
+
+                // Add hole to holes
+                teams.add(team);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return teams;
+    }
+
+    public int updateTeam(Team team) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TEAM_ID, team.getTeamId());
+        values.put(COLUMN_ROUND_ID, team.getRoundId());
+        values.put(COLUMN_TEAM_NUMBER, team.getTeamNumber());
+
+        // 3. updating row
+        int i = db.update(TABLE_TEAM, //table
+                values, // column/value
+                COLUMN_TEAM_ID + " = ?", // selections
+                new String[]{String.valueOf(team.getTeamId())}); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteTeam(Team team) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_TEAM, //table name
+                COLUMN_TEAM_ID + " = ?",  // selections
+                new String[]{String.valueOf(team.getTeamId())}); //selections args
+
+        // 3. close
+        db.close();
+
+    }
+
+    //Round Methods
+    public void addRound(Round round) {
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ROUND_ID, round.getRoundId());
+        values.put(COLUMN_COURSE_ID, round.getCourseId());
+        values.put(COLUMN_DATE, round.getDate());
+
+
+        // 3. insert
+        db.insert(TABLE_ROUND, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public Round getRound(int id) {
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_ROUND, // a. table
+                        COLUMNS_ROUND, // b. column names
+                        COLUMN_ROUND_ID + " = ?", // c. selections
+                        new String[]{String.valueOf(id)}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build hole object
+        Round round = new Round();
+        round.setRoundId(cursor.getInt(0));
+        round.setCourseId(cursor.getInt(1));
+        round.setDate(cursor.getString(2));
+
+
+        // 5. return hole
+        return round;
+    }
+
+    public ArrayList<Round> getRoundsByCourseId(int courseId) {
+        ArrayList<Round> rounds = new ArrayList<Round>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_ROUND + " WHERE " + COLUMN_COURSE_ID + "==" + courseId;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Round round = null;
+        if (cursor.moveToFirst()) {
+            do {
+                round = new Round();
+                round.setRoundId(cursor.getInt(0));
+                round.setCourseId(cursor.getInt(1));
+                round.setDate(cursor.getString(2));
+
+                // Add hole to holes
+                rounds.add(round);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return rounds;
+    }
+
+    public ArrayList<Round> getAllRounds() {
+        ArrayList<Round> rounds = new ArrayList<Round>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_ROUND ;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Round round = null;
+        if (cursor.moveToFirst()) {
+            do {
+                round = new Round();
+                round.setRoundId(cursor.getInt(0));
+                round.setCourseId(cursor.getInt(1));
+                round.setDate(cursor.getString(2));
+
+                // Add hole to holes
+                rounds.add(round);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return rounds;
+    }
+
+    public int updateRound(Round round) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ROUND_ID, round.getRoundId());
+        values.put(COLUMN_COURSE_ID, round.getCourseId());
+        values.put(COLUMN_DATE, round.getDate());
+
+        // 3. updating row
+        int i = db.update(TABLE_ROUND, //table
+                values, // column/value
+                COLUMN_ROUND_ID + " = ?", // selections
+                new String[]{String.valueOf(round.getRoundId())}); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteRound(Round round) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_ROUND, //table name
+                COLUMN_ROUND_ID + " = ?",  // selections
+                new String[]{String.valueOf(round.getRoundId())}); //selections args
+
+        // 3. close
+        db.close();
+
+    }
+
+    //Shot Methods
+    public void addShot(Shot shot) {
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SHOT_ID, shot.getShotId());
+        values.put(COLUMN_HOLE_ID, shot.getHoleId());
+        values.put(COLUMN_PLAYER_ID, shot.getPlayerId());
+
+
+        // 3. insert
+        db.insert(TABLE_SHOT, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public Shot getShot(int id) {
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_SHOT, // a. table
+                        COLUMNS_SHOT, // b. column names
+                        COLUMN_SHOT_ID + " = ?", // c. selections
+                        new String[]{String.valueOf(id)}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build hole object
+        Shot shot = new Shot();
+        shot.setShotId(cursor.getInt(0));
+        shot.setHoleId(cursor.getInt(1));
+        shot.setPlayerId(cursor.getInt(2));
+
+
+        // 5. return hole
+        return shot;
+    }
+
+    public ArrayList<Shot> getAllShots() {
+        ArrayList<Shot> shots = new ArrayList<Shot>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_SHOT;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Shot shot = null;
+        if (cursor.moveToFirst()) {
+            do {
+                shot = new Shot();
+                shot.setShotId(cursor.getInt(0));
+                shot.setHoleId(cursor.getInt(1));
+                shot.setPlayerId(cursor.getInt(2));
+
+                // Add hole to holes
+                shots.add(shot);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return shots;
+    }
+
+    public ArrayList<Shot> getShotsByPlayerId(int playerId) {
+        ArrayList<Shot> shots = new ArrayList<Shot>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_SHOT + " WHERE " + COLUMN_PLAYER_ID + "==" + playerId;;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Shot shot = null;
+        if (cursor.moveToFirst()) {
+            do {
+                shot = new Shot();
+                shot.setShotId(cursor.getInt(0));
+                shot.setHoleId(cursor.getInt(1));
+                shot.setPlayerId(cursor.getInt(2));
+
+                // Add hole to holes
+                shots.add(shot);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return shots;
+    }
+
+    public ArrayList<Shot> getShotsByHoleId(int holeId) {
+        ArrayList<Shot> shots = new ArrayList<Shot>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_SHOT + " WHERE " + COLUMN_HOLE_ID + "==" + holeId;;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build hole and add it to list
+        Shot shot = null;
+        if (cursor.moveToFirst()) {
+            do {
+                shot = new Shot();
+                shot.setShotId(cursor.getInt(0));
+                shot.setHoleId(cursor.getInt(1));
+                shot.setPlayerId(cursor.getInt(2));
+
+                // Add hole to holes
+                shots.add(shot);
+            } while (cursor.moveToNext());
+        }
+        // return holes
+        return shots;
+    }
+
+    public int updateShot(Shot shot) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SHOT_ID, shot.getShotId());
+        values.put(COLUMN_HOLE_ID, shot.getHoleId());
+        values.put(COLUMN_PLAYER_ID, shot.getPlayerId());
+
+        // 3. updating row
+        int i = db.update(TABLE_SHOT, //table
+                values, // column/value
+                COLUMN_SHOT_ID + " = ?", // selections
+                new String[]{String.valueOf(shot.getShotId())}); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteShot(Shot shot) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_SHOT, //table name
+                COLUMN_SHOT_ID + " = ?",  // selections
+                new String[]{String.valueOf(shot.getShotId())}); //selections args
 
         // 3. close
         db.close();

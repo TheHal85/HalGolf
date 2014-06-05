@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MC Golf 2014</string>
-    <string name="title_section1">Rules 2014</string>
+    <string name="app_name">Golf 2014</string>
+    <string name="title_section1">Score Tracker</string>
     <string name="title_section2">Players</string>
-    <string name="title_section3">Score Tracker</string>
+    <string name="title_section3">Rules 2014</string>
     <string name="title_section4">Course Information</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Delete All</string>
+    <string name="action_add">Add</string>
+    <string name="action_done">Done</string>
 
     <string-array name="golf_first_name">
         <item>Mike</item>
@@ -78,11 +80,9 @@
         <item>Liu</item>
         <item>Decker</item>
     </string-array>
-
     <string-array name="courses">
-    <item>PineCrest Country Club</item>
+        <item>PineCrest Country Club</item>
     </string-array>
-
     <string-array name="rules">
         <item>Each player will hit a ball off the tee (first shot for the hole)</item>
         <item>The team will decide which of the first shots is to be used. The person who hit that first shot will no longer hit any more balls until the other 3 players have their shot used. The 3 remaining players will hit a ball from the position of the first shot.</item>
@@ -92,5 +92,7 @@ a.     On your scorecard, for each hole, put an check mark in the box for the pe
     </string-array>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_score_tracking">Score Tracker</string>
+    <string name="title_activity_course_information">Course Information</string>
 
 </resources>

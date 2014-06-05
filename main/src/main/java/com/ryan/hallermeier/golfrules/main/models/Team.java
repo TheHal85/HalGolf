@@ -26,7 +26,7 @@ public class Team {
 
     @Override
     public String toString() {
-        return "Team";
+        return "Team " + teamNumber;
     }
 
     public int getId() {

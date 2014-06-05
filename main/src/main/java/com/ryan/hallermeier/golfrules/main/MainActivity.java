@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,6 +15,9 @@ import android.support.v4.widget.DrawerLayout;
 import com.ryan.hallermeier.golfrules.main.models.Course;
 import com.ryan.hallermeier.golfrules.main.models.Hole;
 import com.ryan.hallermeier.golfrules.main.models.Player;
+import com.ryan.hallermeier.golfrules.main.models.Round;
+import com.ryan.hallermeier.golfrules.main.models.Shot;
+import com.ryan.hallermeier.golfrules.main.models.Team;
 import com.ryan.hallermeier.golfrules.main.util.DBUtils;
 
 import java.util.ArrayList;
@@ -37,6 +41,8 @@ public class MainActivity extends Activity
     private DBUtils dbUtils;
 
     private ArrayList<String> rules;
+
+    public static final String ROUND_ID = "round_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,7 @@ public class MainActivity extends Activity
         rules = new ArrayList<String>();
         Collections.addAll(rules, rulesArray);
 
+
     }
 
     @Override
@@ -87,7 +94,7 @@ public class MainActivity extends Activity
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (position) {
             case 0:
-                fragmentTransaction.replace(R.id.container, RulesFragment.newInstance());
+                fragmentTransaction.replace(R.id.container, ScoreTrackerFragment.newInstance());
                 fragmentTransaction.commit();
                 break;
             case 1:
@@ -95,32 +102,15 @@ public class MainActivity extends Activity
                 fragmentTransaction.commit();
                 break;
             case 2:
-                fragmentTransaction.replace(R.id.container, ScoreTrackerFragment.newInstance());
+                fragmentTransaction.replace(R.id.container, RulesFragment.newInstance());
                 fragmentTransaction.commit();
                 break;
             case 3:
-                fragmentTransaction.replace(R.id.container, CourseFragment.newInstance());
-                fragmentTransaction.commit();
+                Intent intent = new Intent(this, HoleDescriptionActivity.class);
+                startActivity(intent);
                 break;
         }
 
-    }
-
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-            case 4:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
     }
 
     private void createCourses(DBUtils dbUtils, String[] courseNames) {
@@ -145,14 +135,14 @@ public class MainActivity extends Activity
         }
     }
 
-    private void createHoles(DBUtils dbUtils, int courseId ,  int[] parValues, int[] menDistances, int[] womensDistance) {
+    private void createHoles(DBUtils dbUtils, int courseId, int[] parValues, int[] menDistances, int[] womensDistance) {
         ArrayList<Hole> holes = dbUtils.getAllHolesByCourseId(courseId);
         for (Hole hole : holes) {
             dbUtils.deleteHole(hole);
         }
         final int size = parValues.length;
         for (int i = 0; i < size; i++) {
-            dbUtils.addHole(new Hole(i+1, courseId, parValues[i], menDistances[i], womensDistance[i]));
+            dbUtils.addHole(new Hole(i + 1, courseId, parValues[i], menDistances[i], womensDistance[i]));
         }
     }
 
@@ -162,6 +152,56 @@ public class MainActivity extends Activity
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
+
+    private void deleteAllPlayers()
+    {
+        ArrayList<Player> players = dbUtils.getAllPlayers();
+        for (Player player : players) {
+            dbUtils.deletePlayer(player);
+        }
+    }
+
+    private void deleteAllShots()
+    {
+        ArrayList<Shot> shots = dbUtils.getAllShots();
+        for (Shot shot : shots) {
+            dbUtils.deleteShot(shot);
+        }
+    }
+
+    private void deleteAllCourses()
+    {
+        ArrayList<Course> courses = dbUtils.getAllCourses();
+        for (Course course : courses) {
+            dbUtils.deleteCourse(course);
+        }
+    }
+
+    private void deleteAllHoles()
+    {
+        ArrayList<Hole> holes = dbUtils.getAllHoles();
+        for (Hole hole : holes) {
+            dbUtils.deleteHole(hole);
+        }
+    }
+
+
+    private void deleteAllTeams()
+    {
+        ArrayList<Team> teams = dbUtils.getAllTeams();
+        for (Team team : teams) {
+            dbUtils.deleteTeam(team);
+        }
+    }
+
+    private void deleteAllRounds()
+    {
+        ArrayList<Round> rounds = dbUtils.getAllRounds();
+        for (Round round : rounds) {
+            dbUtils.deleteRound(round);
+        }
+    }
+
 
 
     @Override
@@ -184,9 +224,68 @@ public class MainActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            deleteAllPlayers();
+            deleteAllRounds();
+            deleteAllTeams();
+            deleteAllCourses();
+            deleteAllHoles();
+            deleteAllShots();
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void setActionBarTitle(String title) {
+       mTitle = title;
+       getActionBar().setTitle(mTitle);
+    }
+
+    @Override
+    public void createNewRound() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, NewRoundCourseSelectionFragment.newInstance());
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onNewRoundCourseSelected(int teamId) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, NewTeamPlayersFragment.newInstance(teamId));
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public ArrayList<Team> getAllTeams() {
+        return dbUtils.getAllTeams();
+    }
+
+    @Override
+    public void addRound(Round round) {
+        dbUtils.addRound(round);
+    }
+
+    @Override
+    public void addTeam(Team team) {
+        dbUtils.addTeam(team);
+    }
+
+    @Override
+    public void updatePlayer(Player player) {
+        dbUtils.updatePlayer(player);
+    }
+
+    @Override
+    public void showScoreTrackerFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, ScoreTrackerFragment.newInstance());
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -198,8 +297,8 @@ public class MainActivity extends Activity
     public void onCourseSelected(int courseId) {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container, HoleInformationalFragment.newInstance(courseId));
-                fragmentTransaction.commit();
+        fragmentTransaction.replace(R.id.container, HoleInformationalFragment.newInstance(courseId));
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -215,6 +314,23 @@ public class MainActivity extends Activity
     @Override
     public ArrayList<String> getRules() {
         return rules;
+    }
+
+    @Override
+    public ArrayList<Round> getRounds() {
+        return dbUtils.getAllRounds();
+    }
+
+    @Override
+    public void onRoundSelected(int roundId) {
+        Intent intent = new Intent(this, ScoreTrackingActivity.class);
+        intent.putExtra(ROUND_ID, roundId);
+        startActivity(intent);
+    }
+
+    @Override
+    public ArrayList<Team> getTeamsByRoundId(int roundId) {
+        return dbUtils.getTeamsByRoundId(roundId);
     }
 
 }

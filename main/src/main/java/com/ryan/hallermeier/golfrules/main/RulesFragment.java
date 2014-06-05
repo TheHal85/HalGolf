@@ -66,7 +66,7 @@ public class RulesFragment extends Fragment implements AbsListView.OnItemClickLi
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
-
+mListener.setActionBarTitle("2014 Rules");
         return view;
     }
 

@@ -1,8 +1,10 @@
 package com.ryan.hallermeier.golfrules.main;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +12,9 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
-
-import com.ryan.hallermeier.golfrules.main.dummy.DummyContent;
 import com.ryan.hallermeier.golfrules.main.models.Course;
 
 /**
@@ -25,7 +26,7 @@ import com.ryan.hallermeier.golfrules.main.models.Course;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class CourseFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class NewRoundCourseSelectionFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private GolfFragmentInteractionInterface mListener;
 
@@ -40,8 +41,10 @@ public class CourseFragment extends Fragment implements AbsListView.OnItemClickL
      */
     private ListAdapter mAdapter;
 
-    public static CourseFragment newInstance() {
-        CourseFragment fragment = new CourseFragment();
+    private NumberPicker myPicker;
+
+    public static NewRoundCourseSelectionFragment newInstance() {
+        NewRoundCourseSelectionFragment fragment = new NewRoundCourseSelectionFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -51,7 +54,7 @@ public class CourseFragment extends Fragment implements AbsListView.OnItemClickL
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CourseFragment() {
+    public NewRoundCourseSelectionFragment() {
     }
 
     @Override
@@ -78,7 +81,7 @@ public class CourseFragment extends Fragment implements AbsListView.OnItemClickL
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
-        mListener.setActionBarTitle("Course Information");
+        mListener.setActionBarTitle("Select Course");
         return view;
     }
 
@@ -105,7 +108,8 @@ public class CourseFragment extends Fragment implements AbsListView.OnItemClickL
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onCourseSelected(position);
+
+            showDialog();
         }
     }
 
@@ -120,6 +124,55 @@ public class CourseFragment extends Fragment implements AbsListView.OnItemClickL
         if (emptyText instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
+    }
+
+    DialogInterface.OnClickListener mvpdSelectorDialogListener = new DialogInterface.OnClickListener()
+    {
+
+        @Override
+        public void onClick( DialogInterface dialog, int which )
+        {
+            switch ( which )
+            {
+                case DialogInterface.BUTTON_POSITIVE:
+                    mListener.onNewRoundCourseSelected(myPicker.getValue());
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    dialog.dismiss();
+                    break;
+            }
+        }
+    };
+
+    void showDialog()
+    {
+        //IF TEXT IS NOT VISIBLE, BE SURE YOU COMMENTED OUT
+        //        mInputText.setFilters(new InputFilter[] {
+        //                new InputTextFilter()
+        //        });
+        //IN NUMBERPICKER (net.simontvt_numberpicker)
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                getActivity() );
+
+
+        // inform the dialog it has a custom View
+        // and if you need to call some method of the class
+        myPicker = new NumberPicker(getActivity());
+        myPicker.setMinValue(1);
+        myPicker.setMaxValue( 8 );
+        myPicker.setDescendantFocusability( NumberPicker.FOCUS_BLOCK_DESCENDANTS );
+        myPicker.setWrapSelectorWheel( false );
+        builder.setView( myPicker );
+        builder.setTitle("Select Team Number"  )
+                .setCancelable( true )
+                .setNegativeButton( "Cancel",
+                        mvpdSelectorDialogListener )
+                .setPositiveButton("OK",
+                        mvpdSelectorDialogListener);
+        // create the dialog from the builder then show
+        builder.create();
+        builder.show();
     }
 
 }

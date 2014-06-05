@@ -10,12 +10,12 @@ public class Round {
 
     private int roundId;
     private int courseId;
-    private Date date;
+    private String date;
     private ArrayList<Team> teams;
 
     public Round(){}
 
-    public Round(int roundId, int courseId,  Date date) {
+    public Round(int roundId, int courseId,  String date) {
         super();
         this.roundId = roundId;
         this.courseId = courseId;
@@ -26,7 +26,7 @@ public class Round {
 
     @Override
     public String toString() {
-        return "Round";
+        return "Round started on " + date;
     }
 
     public int getRoundId() {
@@ -45,11 +45,11 @@ public class Round {
         this.courseId = courseId;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

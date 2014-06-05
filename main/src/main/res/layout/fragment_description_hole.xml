@@ -1,0 +1,56 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ryan.hallermeier.golfrules.main.ScoringHoleFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/holeName"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/par"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/mensDistance"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/womensDistance"
+            android:textStyle="bold"
+            android:textColor="@color/Red"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+
+
+
+</FrameLayout>
